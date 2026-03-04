@@ -25,7 +25,7 @@
 // @match *://*.google.co.jp/search*
 // @match *://*.google.co.jp/imghp*
 // @match *://scholar.google.co.jp/*
-// @require https://raw.githubusercontent.com/userElaina/this-is-the-China-website/main/shared/site-engine.js
+// @require https://raw.githubusercontent.com/heritager/this-is-the-China-website/main/shared/site-engine.js
 // @grant none
 // ==/UserScript==
 

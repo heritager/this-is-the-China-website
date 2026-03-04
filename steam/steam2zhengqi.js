@@ -7,7 +7,7 @@
 // @license MIT
 // @match *://*.steampowered.com/*
 // @match *://*.steamcommunity.com/*
-// @require https://raw.githubusercontent.com/userElaina/this-is-the-China-website/main/shared/site-engine.js
+// @require https://raw.githubusercontent.com/heritager/this-is-the-China-website/main/shared/site-engine.js
 // @grant none
 // ==/UserScript==
 

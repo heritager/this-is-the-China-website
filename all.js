@@ -36,8 +36,8 @@
 // @match *://*.google.co.jp/search*
 // @match *://*.google.co.jp/imghp*
 // @match *://scholar.google.co.jp/*
-// @icon https://raw.githubusercontent.com/userElaina/this-is-the-China-website/refs/heads/main/jing.png
-// @require https://raw.githubusercontent.com/userElaina/this-is-the-China-website/main/shared/site-engine.js
+// @icon https://raw.githubusercontent.com/heritager/this-is-the-China-website/main/jing.png
+// @require https://raw.githubusercontent.com/heritager/this-is-the-China-website/main/shared/site-engine.js
 // @grant none
 // @run-at document-idle
 // ==/UserScript==
