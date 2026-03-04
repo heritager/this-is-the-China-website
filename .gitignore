@@ -5,3 +5,9 @@
 tempCodeRunnerFile.*
 
 archive*
+
+node_modules/
+playwright-report/
+test-results/
+tests/__screenshots__/
+tests/*-snapshots/

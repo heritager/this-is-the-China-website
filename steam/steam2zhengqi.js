@@ -1,66 +1,26 @@
 // ==UserScript==
 // @name 蒸汽平台美化
 // @namespace https://github.com/userElaina/this-is-the-China-website
-// @version 2024.08.28.01
+// @version 2026.03.04.02
 // @description 中国人就用蒸汽平台
 // @author userElaina
 // @license MIT
 // @match *://*.steampowered.com/*
 // @match *://*.steamcommunity.com/*
+// @require https://raw.githubusercontent.com/userElaina/this-is-the-China-website/main/shared/site-engine.js
 // @grant none
 // ==/UserScript==
 
-function sleep(time) {
-    return new Promise((resolve) => setTimeout(resolve, time));
-}
+(function () {
+    'use strict';
 
-async function f_succ(f, msSleep = 500, maxCount = 10) {
-    let count = 0;
-    while (true) {
-        try {
-            if (f()) {
-                return true;
-            }
-        } catch (e) {
-            console.log(e);
-        }
-        count++;
-        if (count > maxCount) {
-            return false;
-        }
-        await sleep(msSleep);
+    if (!window.ChinaWebsiteMaskEngine) {
+        return;
     }
-}
 
-(async function () {
-    // change title
-    document.title = document.title.replace('Steam', '蒸汽平台');
-
-    // change logo on top left
-    f_succ(() => {
-        let logo = document.getElementById("logo_holder");
-        if (logo === null) {
-            return false;
-        }
-        logo.childNodes[1].childNodes[1].src = 'https://raw.githubusercontent.com/userElaina/this-is-the-China-website/main/steam/logo.svg';
-        return true;
+    window.ChinaWebsiteMaskEngine.run({
+        site: 'steam',
+        exposeConfigApi: false,
+        forceEnabled: true
     });
-
-    /*
-    let giftcard = document.getElementsByClassName('home_page_gutter_giftcard');
-    if (giftcard.length > 0) {
-        giftcard[0].height = 0;
-    }
-    */
-
-    // hide giftcard
-    f_succ(() => {
-        let giftcard = document.getElementsByClassName('top_promo ds_no_flags app_impression_tracked');
-        if (giftcard.length <= 0) {
-            return false;
-        }
-        giftcard[0].innerHTML = '';
-        return true;
-    });
-
 })();
