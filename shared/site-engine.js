@@ -5,13 +5,14 @@
         return;
     }
 
-    const ENGINE_VERSION = '2026.03.04.02';
+    const ENGINE_VERSION = '2026.03.04.03';
     const ASSET_BASE = 'https://raw.githubusercontent.com/userElaina/this-is-the-China-website/main';
     const STORAGE_KEY = '__china_website_mask_config_v2__';
 
     const DEFAULT_CONFIG = {
         enabled: true,
         youtubeBrand: 'bilibili',
+        googleBrand: 'baidu',
         siteEnabled: {
             google: true,
             wikipedia: true,
@@ -19,7 +20,9 @@
             github: true,
             steam: true,
             twitter: true,
-            reddit: true
+            reddit: true,
+            quora: true,
+            ao3: true
         }
     };
 
@@ -48,8 +51,8 @@
         }
     };
 
-    const SPA_SITES = new Set(['youtube', 'github', 'twitter', 'reddit', 'wikipedia']);
-    const DOM_OBSERVED_SITES = new Set(['youtube', 'github', 'twitter', 'reddit', 'wikipedia', 'google']);
+    const SPA_SITES = new Set(['youtube', 'github', 'twitter', 'reddit', 'wikipedia', 'quora', 'ao3']);
+    const DOM_OBSERVED_SITES = new Set(['youtube', 'github', 'twitter', 'reddit', 'wikipedia', 'google', 'quora', 'ao3']);
 
     function deepMerge(base, patch) {
         const out = Object.assign({}, base);
@@ -75,6 +78,7 @@
 
         const merged = deepMerge(DEFAULT_CONFIG, raw);
         merged.youtubeBrand = merged.youtubeBrand === 'xigua' ? 'xigua' : 'bilibili';
+        merged.googleBrand = merged.googleBrand === 'wild' ? 'wild' : 'baidu';
         return merged;
     }
 
@@ -206,6 +210,8 @@
         if (/(^|\.)(steampowered\.com|steamcommunity\.com)$/.test(hostname)) return 'steam';
         if (/(^|\.)(twitter\.com|x\.com)$/.test(hostname)) return 'twitter';
         if (/(^|\.)reddit\.com$/.test(hostname)) return 'reddit';
+        if (/(^|\.)quora\.com$/.test(hostname)) return 'quora';
+        if (/(^|\.)archiveofourown\.org$/.test(hostname)) return 'ao3';
         return '';
     }
 
@@ -330,14 +336,16 @@
 
     function buildProfiles(config) {
         const ytBrand = YOUTUBE_BRANDS[config.youtubeBrand] || YOUTUBE_BRANDS.bilibili;
+        const googleBrand = config.googleBrand === 'wild' ? 'wild' : 'baidu';
+        const isWildGoogle = googleBrand === 'wild';
 
         return {
             google: {
                 siteName: 'Google',
-                favicon: 'google/baidu.ico',
+                favicon: isWildGoogle ? 'https://www.sogou.com/favicon.ico' : 'google/baidu.ico',
                 colorScheme: {
-                    accent: '#4e6ef2',
-                    background: '#4e6ef21f'
+                    accent: isWildGoogle ? '#e67e22' : '#4e6ef2',
+                    background: isWildGoogle ? '#fff4e8' : '#4e6ef21f'
                 },
                 logoUrl: 'google/baidu_big.png',
                 repeatIntervalMs: 1400,
@@ -351,9 +359,16 @@
                         box-shadow: none !important;
                         background: ${profile.colorScheme.background} !important;
                     }
+
+                    .cwm-wild-google-logo {
+                        font-size: 42px;
+                        font-weight: 800;
+                        color: #e67e22;
+                        letter-spacing: 2px;
+                    }
                 `,
                 placeholders: [
-                    { selectors: ['textarea[name="q"]', 'input[name="q"]'], text: '百度一下' }
+                    { selectors: ['textarea[name="q"]', 'input[name="q"]'], text: isWildGoogle ? '震惊一下，马上知道' : '百度一下' }
                 ],
                 title: () => {
                     const isScholar = location.hostname.startsWith('scholar.');
@@ -361,18 +376,34 @@
                     const isSearch = location.pathname.includes('/search');
                     const q = queryParam('q');
 
-                    if (isScholar) return q ? `${q} - 百度学术` : '百度学术 - 保持学习的态度';
-                    if (isImages) return q ? `${q} - 百度图片` : '百度图片, 发现多彩世界';
-                    if (isSearch) return q ? `${q} - 百度搜索` : '百度搜索';
-                    return '百度一下，你就知道';
+                    if (isScholar) return q ? `${q} - ${isWildGoogle ? '震惊学术' : '百度学术'}` : `${isWildGoogle ? '震惊学术' : '百度学术'} - 保持学习的态度`;
+                    if (isImages) return q ? `${q} - ${isWildGoogle ? '震惊图片' : '百度图片'}` : `${isWildGoogle ? '震惊图片，发现离谱世界' : '百度图片, 发现多彩世界'}`;
+                    if (isSearch) return q ? `${q} - ${isWildGoogle ? '震惊搜索' : '百度搜索'}` : `${isWildGoogle ? '震惊搜索' : '百度搜索'}`;
+                    return isWildGoogle ? '震惊一下，你就知道' : '百度一下，你就知道';
                 },
                 applyCustom: () => {
-                    replaceImage([
+                    const selectors = [
                         'img[alt="Google"]',
                         'img[alt="Google Images"]',
                         'a[aria-label="Google"] img',
                         'a[aria-label="Google 首页"] img'
-                    ], 'google/baidu_big.png', { width: 234, height: 76, alt: '百度' });
+                    ];
+
+                    if (isWildGoogle) {
+                        const logo = document.querySelector(selectors.join(','));
+                        if (logo && logo.parentElement) {
+                            logo.style.display = 'none';
+                            if (!logo.parentElement.querySelector('.cwm-wild-google-logo')) {
+                                const textLogo = document.createElement('span');
+                                textLogo.className = 'cwm-wild-google-logo';
+                                textLogo.textContent = '震惊搜索';
+                                logo.parentElement.appendChild(textLogo);
+                            }
+                        }
+                        return;
+                    }
+
+                    replaceImage(selectors, 'google/baidu_big.png', { width: 234, height: 76, alt: '百度' });
                 }
             },
 
@@ -583,6 +614,94 @@
                         width: 135,
                         height: 45
                     });
+                }
+            },
+
+            quora: {
+                siteName: 'Quora',
+                favicon: 'https://static.zhihu.com/heifetz/favicon.ico',
+                logoUrl: 'https://static.zhihu.com/heifetz/favicon.ico',
+                colorScheme: {
+                    accent: '#1677ff',
+                    background: '#eaf3ff'
+                },
+                repeatIntervalMs: 1200,
+                repeatMaxRuns: 200,
+                observeNavigation: true,
+                observeDom: true,
+                placeholders: [
+                    {
+                        selectors: [
+                            'input[type="search"]',
+                            'input[placeholder*="Search Quora"]',
+                            'input[aria-label*="Search"]'
+                        ],
+                        text: '搜索你感兴趣的问题'
+                    }
+                ],
+                styles: () => `
+                    a[href="/"] svg {
+                        opacity: 0 !important;
+                    }
+
+                    a[href="/"]::before {
+                        content: '知乎';
+                        display: inline-block;
+                        font-size: 26px;
+                        font-weight: 700;
+                        color: #1677ff;
+                    }
+                `,
+                title: () => {
+                    const home = location.pathname === '/';
+                    if (home) {
+                        return '知乎 - 有问题，就会有答案';
+                    }
+                    const base = (document.title || '').replace(/\s*[-|]\s*Quora[\s\S]*$/i, '').trim();
+                    return base ? `${base} - 知乎` : '知乎 - 有问题，就会有答案';
+                }
+            },
+
+            ao3: {
+                siteName: 'Archive of Our Own',
+                favicon: 'https://www.lofter.com/favicon.ico',
+                logoUrl: 'https://www.lofter.com/favicon.ico',
+                colorScheme: {
+                    accent: '#35b558',
+                    background: '#edf9f0'
+                },
+                repeatIntervalMs: 1300,
+                repeatMaxRuns: 200,
+                observeNavigation: true,
+                observeDom: true,
+                placeholders: [
+                    {
+                        selectors: [
+                            '#site_search',
+                            'input[name="work_search[query]"]',
+                            'input[type="search"]'
+                        ],
+                        text: '搜索乐乎内容'
+                    }
+                ],
+                styles: () => `
+                    #header .heading a {
+                        color: #35b558 !important;
+                    }
+                `,
+                title: () => {
+                    const t = (document.title || '').trim();
+                    const cleaned = t
+                        .replace(/\s*[-|]\s*Archive of Our Own[\s\S]*$/i, '')
+                        .replace(/\s*[-|]\s*AO3[\s\S]*$/i, '')
+                        .trim();
+                    return cleaned ? `${cleaned} - 乐乎` : '乐乎 - 让兴趣，更有趣';
+                },
+                applyCustom: () => {
+                    const logo = document.querySelector('#header .heading a, #header h1 a');
+                    if (logo && logo.textContent !== '乐乎') {
+                        logo.textContent = '乐乎';
+                    }
                 }
             }
         };

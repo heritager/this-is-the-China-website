@@ -27,6 +27,26 @@ const CASES = [
         }
     },
     {
+        name: 'google-wild-home',
+        site: 'google',
+        configOverride: { googleBrand: 'wild' },
+        html: `
+            <html>
+              <head>
+                <title>Google</title>
+              </head>
+              <body>
+                <div class="RNNXgb"><textarea name="q"></textarea></div>
+                <a aria-label="Google"><img alt="Google" src="x.png"></a>
+              </body>
+            </html>
+        `,
+        checks: async (page) => {
+            await expect(page.locator('textarea[name="q"]')).toHaveAttribute('placeholder', '震惊一下，马上知道');
+            await expect(page).toHaveTitle('震惊一下，你就知道');
+        }
+    },
+    {
         name: 'wikipedia-page',
         site: 'wikipedia',
         html: `
@@ -81,6 +101,43 @@ const CASES = [
         checks: async (page) => {
             await expect(page.locator('input[aria-label="Search or jump to..."]')).toHaveAttribute('placeholder', '搜索 Gitee');
             await expect(page).toHaveTitle('Gitee - 基于 Git 的代码托管和研发协作平台');
+        }
+    },
+    {
+        name: 'quora-home',
+        site: 'quora',
+        html: `
+            <html>
+              <head><title>Quora</title><link rel="icon" href="/favicon.ico"></head>
+              <body>
+                <a href="/"><svg></svg></a>
+                <input type="search" placeholder="Search Quora">
+              </body>
+            </html>
+        `,
+        checks: async (page) => {
+            await expect(page.locator('input[type="search"]')).toHaveAttribute('placeholder', '搜索你感兴趣的问题');
+            await expect(page).toHaveTitle('知乎 - 有问题，就会有答案');
+        }
+    },
+    {
+        name: 'ao3-home',
+        site: 'ao3',
+        html: `
+            <html>
+              <head><title>Archive of Our Own</title></head>
+              <body>
+                <div id="header">
+                  <h1 class="heading"><a href="/">Archive of Our Own</a></h1>
+                </div>
+                <input id="site_search" placeholder="Search">
+              </body>
+            </html>
+        `,
+        checks: async (page) => {
+            await expect(page.locator('#site_search')).toHaveAttribute('placeholder', '搜索乐乎内容');
+            await expect(page).toHaveTitle('乐乎 - 让兴趣，更有趣');
+            await expect(page.locator('#header .heading a')).toHaveText('乐乎');
         }
     },
     {

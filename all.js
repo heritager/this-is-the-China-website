@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name 国际网站伪装为国内网站（增强版）
 // @namespace https://github.com/userElaina/this-is-the-China-website
-// @version 2026.03.04.02
+// @version 2026.03.04.03
 // @description 中国人就用中国网站（共享引擎版）
 // @author userElaina, contributors
 // @license MIT
@@ -14,6 +14,8 @@
 // @match *://*.twitter.com/*
 // @match *://*.x.com/*
 // @match *://*.reddit.com/*
+// @match *://*.quora.com/*
+// @match *://*.archiveofourown.org/*
 // @match *://*.google.com/
 // @match *://*.google.com/webhp*
 // @match *://*.google.com/search*
